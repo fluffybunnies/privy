@@ -1,4 +1,6 @@
 
 var lex = 'abcdefghijklmnopqrstuvwxyz';
 
-module.exports = require('../abc')(lex);
+module.exports = require('../abc')(lex, {
+	caseInsensitive: true
+});

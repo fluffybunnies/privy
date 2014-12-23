@@ -2,14 +2,10 @@
 var fs = require('fs')
 ;
 
-module.exports = function(gramName, cb){
+module.exports = function(src){
 	var g = new gram;
-	if (gramName) {
-		g.loadLocal(gramName, function(err){
-			if (cb)
-				cb(err);
-		});
-	}
+	if (src)
+		g.src = __dirname+'/grams/'+src;
 	return g;
 }
 
@@ -17,12 +13,27 @@ module.exports = function(gramName, cb){
 function gram(){
 }
 
-gram.prototype.loadLocal = function(name, cb){
-	var z = this;
-	fs.readFile(__dirname+'/grams/'+name, function(err, data){
+gram.prototype.load = function(/* [src,] cb */){
+	var z = this
+	,src = arguments[0]
+	,cb = arguments[1]
+	;
+	if (src instanceof Function) {
+		cb = src;
+		src = z.src;
+	}
+	if (src)
+		return loadLocal(z, src, cb);
+	process.nextTick(function(){
+		cb('invalid src');
+	});
+}
+
+function loadLocal(gram, path, cb){
+	fs.readFile(path, function(err, data){
 		if (err)
 			return cb(err);
-		z.raw = data.toString();
+		gram.raw = data.toString();
 		cb();
 	});
 }
